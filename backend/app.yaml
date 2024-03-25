@@ -1,0 +1,15 @@
+runtime: python312
+
+service: api
+
+instance_class: F2  
+
+entrypoint: gunicorn -b :$PORT main:app
+
+automatic_scaling:
+  min_instances: 5
+  max_instances: 15
+
+handlers:
+- url: /.*
+  script: auto
