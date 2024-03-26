@@ -4,53 +4,84 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Number Generator</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        const API_BASE_URL = " https://api-dot-loyal-saga-418216.ew.r.appspot.com"; 
+        const API_BASE_URL = "https://api-dot-loyal-saga-418216.ew.r.appspot.com";
 
         function sleep(ms) {
             return new Promise(resolve => setTimeout(resolve, ms));
         }
 
         async function generateNumbers() {
+            let fetchPromises = [];
+
             for (let i = 0; i < 10000; i++) {
-                try {
-                    const response = await fetch(`${API_BASE_URL}/generate_number`);
-                    sleep(300)                    
-                } catch (error) {
-                    console.error("Error generating number:", error);
-                }
+                const fetchPromise = fetch(`${API_BASE_URL}/generate_number`);
+                fetchPromises.push(fetchPromise);
             }
+            await Promise.all(fetchPromises);
+
             alert("Completed generating numbers.");
+        
         }
 
-        async function returnNumbers() {
-            try{
-                const response = await fetch(`${API_BASE_URL}/return_numbers`);
+        async function fetchInstanceSummary() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/instance_summary`);
                 const data = await response.json();
-                return JSON.stringify(data);
-            }catch(error){
-                console.error("error returning result", error)
+                let html = '<h3>Instance Summary</h3>';
+                html += '<table class="table"><thead><tr><th>#</th><th>Instance Name</th><th>Count</th></tr></thead><tbody>';
+                data.forEach((item, index) => {
+                    html += `<tr><td>${index + 1}</td><td>${item.instance_name}</td><td>${item.count}</td></tr>`;
+                });
+                html += '</tbody></table>';
+                document.getElementById('results').innerHTML = html;
+            } catch (error) {
+                console.error("error fetching instance summary", error);
             }
         }
+
+
+        async function fetchExtremeNumbers() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/extreme_numbers`);
+                const data = await response.json();
+                let html = '<h3>Extreme Numbers</h3>';
+                html += '<table class="table">';
+                html += `<tr><td>Smallest Number</td><td>${data.min.number}</td><td>${data.min.instance_name}</td></tr>`;
+                html += `<tr><td>Largest Number</td><td>${data.max.number}</td><td>${data.max.instance_name}</td></tr>`;
+                html += '</table>';
+                document.getElementById('results').innerHTML = html;
+            } catch (error) {
+                console.error("error fetching extreme numbers", error);
+            }
+        }
+
 
         async function restart() {
-            
-            try{
+            try {
                 const response = await fetch(`${API_BASE_URL}/restart`);
-                const result = await response.text();
-                console.log(result);
+                await response.text();
+                console.log("Restarted");
                 alert("Restarted");
-            }catch(error){
-                console.error("error restarting", error)
+            } catch (error) {
+                console.error("error restarting", error);
             }
         }
     </script>
 </head>
 <body>
-    <h2>Number Generator</h2>
-    <button onclick="generateNumbers()">Generate 10,000 Numbers</button>
-    <button onclick="returnNumbers()">Return Results</button>
-    <button onclick="restart()">Restart</button>
+    <div class="container mt-5">
+        <h2>Number Generator</h2>
+        <div class="buttons my-3">
+            <button class="btn btn-primary" onclick="generateNumbers()">Generate 10,000 Numbers</button>
+            <button class="btn btn-info" onclick="fetchInstanceSummary()">Instance Summary</button>
+            <button class="btn btn-warning" onclick="fetchExtremeNumbers()">Extreme Numbers</button>
+            <button class="btn btn-danger" onclick="restart()">Restart</button>
+        </div>
+        <div id="results"></div>
+    </div>
 </body>
 </html>
+

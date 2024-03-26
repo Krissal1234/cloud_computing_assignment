@@ -1,4 +1,5 @@
 from flask import Flask, jsonify
+import time
 import random
 import sqlalchemy
 from google.cloud.sql.connector import Connector
@@ -39,25 +40,33 @@ def generate_random_number():
     with pool.connect() as db_connection:
         db_connection.execute(insert_query, {'number': number, 'instance_name': instance_name})
         db_connection.commit()
+        time.sleep(0.1)
     return jsonify({"number": number})
 
-@app.route('/return_numbers')
-def return_random_numbers():
+@app.route('/instance_summary')
+def instance_summary():
+    query = sqlalchemy.text("""
+        SELECT instance_name, COUNT(*) as count
+        FROM generated_numbers
+        GROUP BY instance_name
+    """)
+    with pool.connect() as db_connection:
+        result = db_connection.execute(query)
+        summary = [{"instance_name": row[0], "count": row[1]} for row in result]
+    return jsonify(summary)
+
+@app.route('/extreme_numbers')
+def extreme_numbers():
     min_query = sqlalchemy.text("SELECT number, instance_name FROM generated_numbers ORDER BY number ASC LIMIT 1")
     max_query = sqlalchemy.text("SELECT number, instance_name FROM generated_numbers ORDER BY number DESC LIMIT 1")
-    count_query = sqlalchemy.text("SELECT COUNT(*) FROM generated_numbers")
-    numbers_query = sqlalchemy.text("SELECT number FROM generated_numbers")
     with pool.connect() as db_connection:
         min_result = db_connection.execute(min_query).fetchone()
         max_result = db_connection.execute(max_query).fetchone()
 
-        total_count = db_connection.execute(count_query).scalar()
-        numbers = [row[0] for row in db_connection.execute(numbers_query).fetchall()]
-
-        min_number, min_instance = min_result if min_result else (None, None)
-        max_number, max_instance = max_result if max_result else (None, None)
-    return jsonify({ "min": {"number": min_number, "instance_name": min_instance},
-        "max": {"number": max_number, "instance_name": max_instance}, "count": total_count, "numbers": numbers})
+    return jsonify({
+        "min": {"number": min_result[0], "instance_name": min_result[1]},
+        "max": {"number": max_result[0], "instance_name": max_result[1]},
+    })
 
 @app.route('/restart', methods=['GET'])
 def restart():
