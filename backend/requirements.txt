@@ -1,4 +1,6 @@
-Flask==2.0.1
-mysql-connector-python==8.0.23
-gunicorn==20.0.4
-
+Flask==3.0.2
+SQLAlchemy==2.0.29
+Flask-Cors==4.0.0
+pymysql
+gunicorn
+cloud-sql-python-connector

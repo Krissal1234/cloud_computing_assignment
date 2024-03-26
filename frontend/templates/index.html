@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Generator</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        const API_BASE_URL = " https://api-dot-loyal-saga-418216.ew.r.appspot.com"; 
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        async function generateNumbers() {
+            for (let i = 0; i < 10000; i++) {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/generate_number`);
+                    sleep(300)                    
+                } catch (error) {
+                    console.error("Error generating number:", error);
+                }
+            }
+            alert("Completed generating numbers.");
+        }
+
+        async function returnNumbers() {
+            try{
+                const response = await fetch(`${API_BASE_URL}/return_numbers`);
+                const data = await response.json();
+                return JSON.stringify(data);
+            }catch(error){
+                console.error("error returning result", error)
+            }
+        }
+
+        async function restart() {
+            
+            try{
+                const response = await fetch(`${API_BASE_URL}/restart`);
+                const result = await response.text();
+                console.log(result);
+                alert("Restarted");
+            }catch(error){
+                console.error("error restarting", error)
+            }
+        }
+    </script>
+</head>
+<body>
+    <h2>Number Generator</h2>
+    <button onclick="generateNumbers()">Generate 10,000 Numbers</button>
+    <button onclick="returnNumbers()">Return Results</button>
+    <button onclick="restart()">Restart</button>
+</body>
+</html>
