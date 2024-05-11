@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: grades-app
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: grades-app
@@ -19,11 +19,11 @@ spec:
         - containerPort: 80
         resources:
           requests:
-            cpu: "250m"
-            memory: "128Mi"
+            cpu: "500m"
+            memory: "500Mi"
           limits:
-            cpu: "250m"
-            memory: "256Mi"
+            cpu: "1000m"
+            memory: "1000Mi"
         env:
         - name: PGHOST
           valueFrom:
@@ -50,13 +50,20 @@ spec:
             secretKeyRef:
               name: postgres-secret
               key: postgres-password
+        volumeMounts:
+        - name: postgres-storage
+          mountPath: /bitnami/postgresql
+      volumes:
+      - name: postgres-storage
+        persistentVolumeClaim:
+          claimName: postgres-pvc
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: grades-service
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   ports:
     - port: 8080
       targetPort: 8080

@@ -8,6 +8,12 @@ global:
 primary:
   persistence:
     enabled: true
+    existingClaim: "postgres-pvc"
+    # storageClass: "standard"
   initdb:
     user: "postgres"
     password: "pass"
+
+securityContext:
+  fsGroup: 1001
+  runAsUser: 1001
