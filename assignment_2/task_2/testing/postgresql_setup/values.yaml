@@ -1,0 +1,13 @@
+global:
+  postgresql:
+    auth:
+      postgresPassword: "pass"
+      username: "postgres"
+      password: "pass"
+      database: "universitydb"
+primary:
+  persistence:
+    enabled: true
+  initdb:
+    user: "postgres"
+    password: "pass"

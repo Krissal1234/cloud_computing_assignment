@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grades-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grades-app
+  template:
+    metadata:
+      labels:
+        app: grades-app
+    spec:
+      containers:
+      - name: grades-app
+        image: markvellaum/universitygrades:v0.0.1
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "128Mi"
+          limits:
+            cpu: "250m"
+            memory: "256Mi"
+        env:
+        - name: PGHOST
+          valueFrom:
+            configMapKeyRef:
+              name: postgres-config
+              key: PGHOST
+        - name: PGPORT
+          valueFrom:
+            configMapKeyRef:
+              name: postgres-config
+              key: PGPORT
+        - name: PGDB
+          valueFrom:
+            configMapKeyRef:
+              name: postgres-config
+              key: PGDB
+        - name: PGUSER
+          valueFrom:
+            configMapKeyRef:
+              name: postgres-config
+              key: PGUSER
+        - name: PGPASS
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: postgres-password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grades-service
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+  selector:
+    app: grades-app

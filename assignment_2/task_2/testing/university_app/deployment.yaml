@@ -1,0 +1,131 @@
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: university-app
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: university-app
+#   template:
+#     metadata:
+#       labels:
+#         app: university-app
+#     spec:
+#       containers:
+#       - name: university-app
+#         image: markvellaum/university:v0.0.1
+#         ports:
+#         - containerPort: 8080
+#         resources:
+#           requests:
+#             cpu: "100m"
+#             memory: "128Mi"
+#           limits:
+#             cpu: "250m"
+#             memory: "256Mi"
+#         env:
+#           - name: PGHOST
+#             valueFrom:
+#               configMapKeyRef:
+#                 name: postgres-config
+#                 key: PGHOST
+#           - name: PGPORT
+#             valueFrom:
+#               configMapKeyRef:
+#                 name: postgres-config
+#                 key: PGPORT
+#           - name: PGDB
+#             valueFrom:
+#               configMapKeyRef:
+#                 name: postgres-config
+#                 key: PGDB
+#           - name: PGUSER
+#             valueFrom:
+#               secretKeyRef:
+#                 name: postgres-secret
+#                 key: postgres-user
+#           - name: PGPASS
+#             valueFrom:
+#               secretKeyRef:
+#                 name: postgres-secret
+#                 key: postgres-password
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: university-service
+# spec:
+#   type: LoadBalancer  # Use LoadBalancer if available, otherwise NodePort
+#   ports:
+#     - port: 8080
+#       targetPort: 8080  # This should match the container port in your deployment
+#       protocol: TCP
+#   selector:
+#     app: university-app  # This should match labels of the university-app pods
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: enrollments-app
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: enrollments-app
+  template:
+    metadata:
+      labels:
+        app: enrollments-app
+    spec:
+      containers:
+      - name: enrollments-app
+        image: markvellaum/university:v0.0.1
+        ports:
+        - containerPort: 8080
+        env:
+        - name: PGHOST
+          valueFrom:
+            configMapKeyRef:
+              name: postgres-config
+              key: PGHOST
+        - name: PGPORT
+          valueFrom:
+            configMapKeyRef:
+              name: postgres-config
+              key: PGPORT
+        - name: PGDB
+          valueFrom:
+            configMapKeyRef:
+              name: postgres-config
+              key: PGDB
+        - name: PGUSER
+          valueFrom:
+            configMapKeyRef:
+              name: postgres-config
+              key: PGUSER
+        - name: PGPASS
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: postgres-password
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "200m"
+            memory: "256Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: enrollments-app-service
+  namespace: default
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 8080
+  selector:
+    app: enrollments-app
