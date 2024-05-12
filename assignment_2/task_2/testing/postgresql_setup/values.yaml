@@ -9,10 +9,12 @@ primary:
   persistence:
     enabled: true
     existingClaim: "postgres-pvc"
-    # storageClass: "standard"
   initdb:
     user: "postgres"
     password: "pass"
+
+volumePermissions:
+  enabled: true
 
 securityContext:
   fsGroup: 1001

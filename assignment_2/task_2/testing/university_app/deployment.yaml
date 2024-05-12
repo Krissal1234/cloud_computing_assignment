@@ -65,9 +65,10 @@ metadata:
   name: enrollments-app-service
   namespace: default
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   ports:
   - port: 80
     targetPort: 8080
+    protocol: TCP
   selector:
     app: enrollments-app
