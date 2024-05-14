@@ -5,12 +5,10 @@ POSTGRES_HELM_RELEASE="postgresdb"
 UNIVERSITY_APP_DEPLOYMENT="enrollments-app"
 GRADES_APP_DEPLOYMENT="grades-app"
 
-# Initialize counters
 successful_checks=0
 failed_checks=0
 
-# Check the installation of the PostgreSQL Helm release
-function check_postgres_with_helm{
+check_postgres_with_helm (){
     if helm status $1 -n $NAMESPACE; then
         echo "$1 has successfully deployed."
         ((successful_checks++))
@@ -19,7 +17,8 @@ function check_postgres_with_helm{
         ((failed_checks++))
     fi
 }
-function check_k8s_resource {
+
+check_k8s_resource (){
     local RESOURCE=$1
     local NAME=$2
     if kubectl get $RESOURCE $NAME -n $NAMESPACE &> /dev/null; then

@@ -7,7 +7,7 @@ sleep 10
 GradesIp=""
 EnrollmentsIp=""
 
-# Wait for the external IPs to be assigned
+# waiting for the external IPs to be assigned
 while [[ -z "$GradesIp" || -z "$EnrollmentsIp" ]]; do
     GradesIp=$(kubectl get svc grades-service -o=jsonpath='{.status.loadBalancer.ingress[0].ip}')
     EnrollmentsIp=$(kubectl get svc enrollments-app-service -o=jsonpath='{.status.loadBalancer.ingress[0].ip}')
@@ -24,7 +24,7 @@ GRADES_BASE_URL="http://${GradesIp}"
 ENROLLMENTS_BASE_URL="http://${EnrollmentsIp}"
 
 TOTAL_REQUESTS=100
-RATIO=10  # Ratio universitygrades:university (10:1)
+RATIO=10
 
 success_count=0
 

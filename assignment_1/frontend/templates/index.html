@@ -16,14 +16,16 @@
         async function generateNumbers() {
             let fetchPromises = [];
 
+            displayLoading(true);
             for (let i = 0; i < 10000; i++) {
                 const fetchPromise = fetch(`${API_BASE_URL}/generate_number`);
                 fetchPromises.push(fetchPromise);
             }
             await Promise.all(fetchPromises);
 
+            displayLoading(false);
             alert("Completed generating numbers.");
-        
+
         }
 
         async function fetchInstanceSummary() {
@@ -58,6 +60,9 @@
             }
         }
 
+         function displayLoading(show) {
+             document.getElementById('loading').style.display = show ? 'block' : 'none';
+         }
 
         async function restart() {
             try {
@@ -79,9 +84,68 @@
             <button class="btn btn-info" onclick="fetchInstanceSummary()">Instance Summary</button>
             <button class="btn btn-warning" onclick="fetchExtremeNumbers()">Extreme Numbers</button>
             <button class="btn btn-danger" onclick="restart()">Restart</button>
+            <img id="loading" src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif" style="display: none;"/>
         </div>
         <div id="results"></div>
     </div>
 </body>
 </html>
 
+ <!-- <!DOCTYPE html>
+ <html lang="en">
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>Number Generator</title>
+     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+     <script>
+         const API_BASE_URL = "https://api-dot-loyal-saga-418216.ew.r.appspot.com";
+
+         function displayLoading(show) {
+             document.getElementById('loading').style.display = show ? 'block' : 'none';
+         }
+
+         function log(message) {
+             const logElement = document.getElementById('log');
+             logElement.innerHTML += message + '<br/>';
+             logElement.scrollTop = logElement.scrollHeight; // Scroll to the bottom of the log
+         }
+
+         async function generateNumbers() {
+             displayLoading(true);
+             log("Starting to generate numbers...");
+
+             let fetchPromises = [];
+             for (let i = 0; i < 10000; i++) {
+                 const fetchPromise = fetch(`${API_BASE_URL}/generate_number`);
+                 fetchPromises.push(fetchPromise);
+                 if (i % 1000 === 0) { // Log every 1000 requests
+                     log(`Requested ${i + 1} numbers...`);
+                 }
+             }
+
+             await Promise.all(fetchPromises);
+             displayLoading(false);
+             log("Completed generating numbers.");
+             alert("Completed generating numbers.");
+         }
+
+         // Other functions remain unchanged...
+     </script>
+ </head>
+ <body>
+     <div class="container mt-5">
+         <h2>Number Generator</h2>
+         <div class="buttons my-3">
+             <button class="btn btn-primary" onclick="generateNumbers()">Generate 10,000 Numbers</button>
+             <button class="btn btn-info" onclick="fetchInstanceSummary()">Instance Summary</button>
+             <button class="btn btn-warning" onclick="fetchExtremeNumbers()">Extreme Numbers</button>
+             <button class="btn btn-danger" onclick="restart()">Restart</button>
+         </div>
+         <div id="results"></div>
+         <div id="log" style="height: 150px; overflow-y: scroll; background: #f8f9fa; border: 1px solid #ccc; padding: 10px; margin-top: 10px;"></div>
+         <img id="loading" src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif" style="display: none;"/>
+     </div>
+ </body>
+ </html> -->
